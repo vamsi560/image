@@ -1,5 +1,5 @@
 name: Terraform Workflow
- 
+
 on:
   push:
     branches:
@@ -7,25 +7,44 @@ on:
   workflow_dispatch:
     inputs:
       region:
-        description: 'region to deploy (e.g., us-east-1)'
+        description: 'Region to deploy (e.g., us-east-1)'
         required: false
         type: string
- 
+
 permissions:
   id-token: write
   contents: read
 
 jobs:
-    build:
-        runs-on: ubuntu-latest 
-        steps:
-            - uses: actions/checkout@v3
+  build:
+    runs-on: ubuntu-22.04  # More stable version
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-            # ... some other preparation steps (dependencies, compilation as a separate step, etc) ...
+      # ✅ Install Testcontainers CLI (Ensures all dependencies are available)
+      - name: Install Testcontainers CLI
+        run: |
+          curl -fsSL https://get.testcontainers.org | bash
+          testcontainers --version
 
-            - name: Setup Testcontainers Cloud Client
-              uses: atomicjar/testcontainers-cloud-setup-action@v1
-              with:
-                  token: ${{ secrets.TC_CLOUD_TOKEN }}
+      # ✅ Set up Testcontainers Cloud Client with Debug Mode
+      - name: Setup Testcontainers Cloud Client
+        uses: atomicjar/testcontainers-cloud-setup-action@v1
+        with:
+          token: ${{ secrets.TC_CLOUD_TOKEN }}
+          debug: true
 
-            # ... existing steps executing your Testcontainers tests go here ...
+      # ✅ Ensure the agent has enough time to start
+      - name: Increase Testcontainers Cloud Timeout
+        run: echo "TESTCONTAINERS_CLOUD_AGENT_TIMEOUT=300" >> $GITHUB_ENV
+
+      # ✅ Ensure network is allowed
+      - name: Allow Network for Testcontainers
+        run: echo "TESTCONTAINERS_CLOUD_ALLOW_NETWORK=true" >> $GITHUB_ENV
+
+      # ✅ Run Testcontainers Tests (Replace with your actual test command)
+      - name: Run Testcontainers Tests
+        run: |
+          echo "Running Testcontainers-based tests..."
+          # Example: ./run-tests.sh  # Replace with your actual test command
