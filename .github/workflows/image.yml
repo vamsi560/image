@@ -22,36 +22,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # ✅ Manually Download and Install Testcontainers Cloud CLI
-      - name: Install Testcontainers Cloud CLI
-        run: |
-          curl -fsSL https://downloads.testcontainers.cloud/installer | bash
-          export PATH=$HOME/.testcontainers/bin:$PATH
-          testcontainers --version || echo "Testcontainers CLI installation failed"
+      
+            # ... some other preparation steps (dependencies, compilation as a separate step, etc) ...
 
-      # ✅ Authenticate Testcontainers Cloud with Token
-      - name: Authenticate Testcontainers Cloud
-        run: |
-          export TC_CLOUD_TOKEN=${{ secrets.TC_CLOUD_TOKEN }}
-          testcontainers auth --token $TC_CLOUD_TOKEN
-
-      # ✅ Setup Testcontainers Cloud Client
       - name: Setup Testcontainers Cloud Client
         uses: atomicjar/testcontainers-cloud-setup-action@v1
         with:
-          token: ${{ secrets.TC_CLOUD_TOKEN }}
-          debug: true
+            token: ${{ secrets.TC_CLOUD_TOKEN }}
 
-      # ✅ Increase Timeout to Ensure Agent Starts
-      - name: Increase Testcontainers Cloud Timeout
-        run: echo "TESTCONTAINERS_CLOUD_AGENT_TIMEOUT=300" >> $GITHUB_ENV
-
-      # ✅ Ensure Network is Allowed
-      - name: Allow Network for Testcontainers
-        run: echo "TESTCONTAINERS_CLOUD_ALLOW_NETWORK=true" >> $GITHUB_ENV
-
-      # ✅ Run Testcontainers Tests (Replace with Your Actual Test Command)
-      - name: Run Testcontainers Tests
-        run: |
-          echo "Running Testcontainers-based tests..."
-          # Example: ./run-tests.sh  # Replace with your actual test command
+      # ... existing steps executing your Testcontainers tests go here ...
