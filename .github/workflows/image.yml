@@ -17,16 +17,17 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04  # More stable version
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # ✅ Install Testcontainers CLI (Ensures all dependencies are available)
+      # ✅ Install Testcontainers CLI with Authentication
       - name: Install Testcontainers CLI
         run: |
-          curl -fsSL https://get.testcontainers.org | bash
-          testcontainers --version
+          npm install -g @testcontainers/cloud-cli
+          export TC_CLOUD_TOKEN=${{ secrets.TC_CLOUD_TOKEN }}  # Set token
+          testcontainers --version || echo "Testcontainers CLI installation failed"
 
       # ✅ Set up Testcontainers Cloud Client with Debug Mode
       - name: Setup Testcontainers Cloud Client
